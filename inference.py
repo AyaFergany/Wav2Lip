@@ -155,7 +155,7 @@ def _load(checkpoint_path):
         checkpoint = torch.load(checkpoint_path,
                                 map_location=lambda storage, loc: storage)
     return checkpoint
-
+'''
 def load_model(path):
     model = Wav2Lip()
     print("Load checkpoint from: {}".format(path))
@@ -168,6 +168,26 @@ def load_model(path):
 
     model = model.to(device)
     return model.eval()
+'''
+def load_model(path):
+    model = Wav2Lip()
+    print("Load checkpoint from: {}".format(path))
+    checkpoint = _load(path)
+    
+    # Example of handling different checkpoint structure
+    if 'state_dict' in checkpoint:
+        state_dict = checkpoint['state_dict']
+    else:
+        state_dict = checkpoint
+    
+    new_s = {}
+    for k, v in state_dict.items():
+        new_s[k.replace('module.', '')] = v
+        
+    model.load_state_dict(new_s)
+    model = model.to(device)
+    return model.eval()
+
 
 def main():
     args.img_size = 96
